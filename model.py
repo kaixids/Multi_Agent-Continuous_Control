@@ -14,7 +14,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, action_size, state_size, hidden_units, seed, gate=F.relu, final_gate=F.tanh):
+    def __init__(self, action_size, state_size, hidden_units, seed):
         """Initialize parameters and build model.
         Params
         ======
@@ -22,13 +22,9 @@ class Actor(nn.Module):
             action_size (int): Dimension of each action
             hidden_units (array): Number of nodes for layers
             seed (int): Random seed
-            gate (function): activation function
-            final_gate (function): final activation function
         """
         super(Actor, self).__init__()
         self.seed = torch.manual_seed(seed)
-        self.gate = gate
-        self.final_gate = final_gate
         self.normalizer = nn.BatchNorm1d(state_size)
         dims = (state_size, ) + hidden_units
         self.layers = nn.ModuleList([nn.Linear(dim_in, dim_out) for dim_in, dim_out in zip(dims[:-1], dims[1:])])
@@ -45,14 +41,14 @@ class Actor(nn.Module):
         """Build an actor (policy) network that maps states -> actions."""
         x = self.normalizer(states)
         for layer in self.layers:
-            x = self.gate(layer(x))
-        return self.final_gate(self.output(x))
+            x = F.relu(layer(x))
+        return F.tanh(self.output(x))
 
     
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, action_size, state_size, hidden_units, seed, gate=F.relu, dropout=0.2):
+    def __init__(self, action_size, state_size, hidden_units, seed, dropout=0.2):
         """Initialize parameters and build model.
         Params
         ======
@@ -60,11 +56,9 @@ class Critic(nn.Module):
             action_size (int): Dimension of each action
             hidden_units (array): Number of nodes for layers
             seed (int): Random seed
-            gate (function): activation function
         """
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
-        self.gate = gate
         self.dropout = nn.Dropout(p=dropout)
         self.normalizer = nn.BatchNorm1d(state_size)
         dims = (state_size, ) + hidden_units
@@ -87,9 +81,9 @@ class Critic(nn.Module):
     def forward(self, states, actions):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
         xs = self.normalizer(states)
-        xs = self.gate(self.layers[0](xs))
+        xs = F.relu(self.layers[0](xs))
         x = torch.cat((xs, actions), dim=1)
         for i in range(1, len(self.layers)):
-            x = self.gate(self.layers[i](x))
-        x = self.dropout(x)
+            x = F.relu(self.layers[i](x))
+        x = nn.Dropout(p=dropout)(x)
         return self.output(x)
