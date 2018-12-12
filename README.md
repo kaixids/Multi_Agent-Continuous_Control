@@ -46,7 +46,7 @@ Run `tennis.ipynb` to get train the agent! Don't forget to change the environmen
 
 The agents are trained using DDPG framework with shared experience. 
 
-Both Actor and Critic networks have two hidden layers of 512 and 256 nodes. Each layer comes with RELU activation. The final output activation is tanh.
+Both Actor and Critic networks have two hidden layers of 512 and 256 nodes. Inputs are normalized using BatchNorm1d. Each layer comes with RELU activation. The final output activation is tanh.
 
 Refer to the `tennis.ipynb` and `config.py` for hyper-parameters
 
