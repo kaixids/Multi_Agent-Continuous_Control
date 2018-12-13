@@ -42,23 +42,4 @@ The environment is considered solved, when the average (over 100 episodes) of th
 Run `tennis.ipynb` to get train the agent! Don't forget to change the environment path  ``env = UnityEnvironment(file_name="Tennis_Windows_x86_64\Tennis.exe")
 `` 
 
-### Model and Hyper Parameters
-
-The agents are trained using DDPG framework with shared experience. 
-
-Both Actor and Critic networks have two hidden layers of 512 and 256 nodes. Inputs are normalized using BatchNorm1d. Each layer comes with RELU activation. The final output activation is tanh.
-
-Refer to the `tennis.ipynb` and `config.py` for hyper-parameters
-
-### Result
-
-The environment is solved below 60 episodes. At 100th episode, the average score has reached 2.
-
-### Future Ideas
-
-- Experimented with different batch sizes, bigger batch sizes do not necessarily improve performance but slow down training
-- Consider implementing PPO 
-- Consider using simple DDPG with the perspective of single player and see if the performance improves
-
-
 
